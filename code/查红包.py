@@ -17,10 +17,10 @@ def sortList2(datas):
 
 def checkHongbao(hongbaos):
     datas = []
-    phone = ''
     for hongbao in hongbaos:
         baos = []
         sid = ''
+        phone = ''
         for i in range(0, len(hongbao)):
             if 'name' in hongbao[i].keys():
                 if hongbao[i]['name'].find('品质') != -1 and hongbao[i]['name'].find('果蔬') == -1 and hongbao[i]['reduce_amount'] >= 5:
@@ -81,40 +81,44 @@ def Main():
     hongbaoUrlStart = 'https://h5.ele.me/restapi/promotion/v1/users/'
     hongbaoUrlEnd = '/coupons?'
     for sid in sids:
-        headers = {
-            'accept': '*/*',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'zh-CN,zh;q=0.9',
-            'cookie': 'SID=' + sid,
-            'referer': 'https://h5.ele.me/profile/benefit/',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-origin',
-            'user-agent': 'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 ('
-                          'KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36',
-            'x-shard': 'loc=0,0'
-        }
-        res = requests.get(userIdUrl, headers=headers)
-        userId = res.text
+        try:
+            headers = {
+                'accept': '*/*',
+                'accept-encoding': 'gzip, deflate, br',
+                'accept-language': 'zh-CN,zh;q=0.9',
+                'cookie': 'SID=' + sid,
+                'referer': 'https://h5.ele.me/profile/benefit/',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'same-origin',
+                'user-agent': 'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) '
+                              'AppleWebKit/537.36 ( '
+                              'KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36',
+                'x-shard': 'loc=0,0'
+            }
+            res = requests.get(userIdUrl, headers=headers)
+            userId = res.text
 
-        res = requests.get(hongbaoUrlStart + userId + hongbaoUrlEnd, headers=headers)
-        hongbao = json.loads(res.text)
+            res = requests.get(hongbaoUrlStart + userId + hongbaoUrlEnd, headers=headers)
+            hongbao = json.loads(res.text)
 
-        if type(hongbao) != list:
-            print('SID无效')
-        else:
-            newSids.append('SID=' + sid)
-            hs = []
-            for h in hongbao:
-                if h['reduce_amount'] >= 5:
-                    hs.append(h['name'] + str(h['sum_condition']) + '-' + str(h['reduce_amount']))
-            if len(hongbao) != 0:
-                print('SID=' + sid + '有效,有' + str(len(hongbao)) + "个红包", hs)
-                # 添加sid
-                hongbao.append({'SID': sid})
-                hongbaos.append(hongbao)
+            if type(hongbao) != list:
+                print('SID无效')
+            else:
+                newSids.append('SID=' + sid)
+                hs = []
+                for h in hongbao:
+                    if h['reduce_amount'] >= 5:
+                        hs.append(h['name'] + str(h['sum_condition']) + '-' + str(h['reduce_amount']))
+                if len(hongbao) != 0:
+                    print('SID=' + sid + '有效,有' + str(len(hongbao)) + "个红包", hs)
+                    # 添加sid
+                    hongbao.append({'SID': sid})
+                    hongbaos.append(hongbao)
 
-        # 延迟3秒
-        time.sleep(0.5)
+            # 延迟3秒
+            time.sleep(0.05)
+        except:
+            continue
     # 保存有效SID
     file = open('../data/new_SID.txt', 'w')
     for line in newSids:

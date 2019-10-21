@@ -39,21 +39,24 @@ class Receive(object):
         res = requests.post(interUrl, headers=headers, data=data)
         volume = json.loads(res.text)
         if volume['message'] == '成功':
-            print('红包'+channel, str(volume['sum']['threshold']) + '-' + str(volume['sum']['amount']))
+            print('红包' + channel, str(volume['sum']['threshold']) + '-' + str(volume['sum']['amount']))
         else:
-            print('红包'+channel, volume['message'])
+            print('红包' + channel, volume['message'])
 
 
 if __name__ == '__main__':
     rec = Receive()
     for sid in SID.getSIDS():
-        rec.updateGeo(sid)
-        rec.getHongbao1(sid, "ele_ka_wpmsj_fkp")
-        rec.getHongbao1(sid, "nr_10hnshentou")
-        rec.getHongbao1(sid, "mrbc_shoutao0907")
-        rec.getHongbao1(sid, "cka-oct")
-        rec.getHongbao1(sid, "nr_10hbshentou")
-        rec.getHongbao1(sid, "nr_1111pzlm")
-        rec.getHongbao1(sid, "mrbc_v2")
-        rec.getHongbao1(sid, "alipay_shh_201909")
-        time.sleep(0.5)
+        try:
+            rec.updateGeo(sid)
+            rec.getHongbao1(sid, "ele_ka_wpmsj_fkp")
+            rec.getHongbao1(sid, "nr_10hnshentou")
+            rec.getHongbao1(sid, "mrbc_shoutao0907")
+            rec.getHongbao1(sid, "cka-oct")
+            rec.getHongbao1(sid, "nr_10hbshentou")
+            rec.getHongbao1(sid, "nr_1111pzlm")
+            rec.getHongbao1(sid, "mrbc_v2")
+            rec.getHongbao1(sid, "alipay_shh_201909")
+            time.sleep(0.5)
+        except:
+            continue
