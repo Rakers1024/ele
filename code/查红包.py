@@ -24,38 +24,44 @@ def checkHongbao(hongbaos):
         for i in range(0, len(hongbao)):
             if 'name' in hongbao[i].keys():
                 if hongbao[i]['name'].find('品质') != -1 and hongbao[i]['name'].find('果蔬') == -1 and hongbao[i]['reduce_amount'] >= 5:
-                    if 'phone' in hongbao[i].keys():
-                        phone = hongbao[i]['phone']
+                    if 'variety' in hongbao[i].keys():
+                        if 'phone' in hongbao[i]['variety'].keys():
+                            phone = hongbao[i]['variety']['phone']
                     baos.append(
                         '品质' + str(hongbao[i]['sum_condition']) + '-' + str(hongbao[i]['reduce_amount']) + '过期' +
                         hongbao[i]['end_date'])
                 elif hongbao[i]['name'].find('通用') != -1 and hongbao[i]['name'].find('果蔬') == -1 and hongbao[i]['reduce_amount'] >= 5:
-                    if 'phone' in hongbao[i].keys():
-                        phone = hongbao[i]['phone']
+                    if 'variety' in hongbao[i].keys():
+                        if 'phone' in hongbao[i]['variety'].keys():
+                            phone = hongbao[i]['variety']['phone']
                     baos.append(
                         '通用' + str(hongbao[i]['sum_condition']) + '-' + str(hongbao[i]['reduce_amount']) + '过期' +
                         hongbao[i]['end_date'])
                 elif hongbao[i]['name'].find('王牌') != -1 and hongbao[i]['reduce_amount'] >= 5:
-                    if 'phone' in hongbao[i].keys():
-                        phone = hongbao[i]['phone']
+                    if 'variety' in hongbao[i].keys():
+                        if 'phone' in hongbao[i]['variety'].keys():
+                            phone = hongbao[i]['variety']['phone']
                     baos.append(
                         '王牌' + str(hongbao[i]['sum_condition']) + '-' + str(hongbao[i]['reduce_amount']) + '过期' +
                         hongbao[i]['end_date'])
                 elif hongbao[i]['name'].find('果蔬商超') != -1 and hongbao[i]['reduce_amount'] >= 7:
-                    if 'phone' in hongbao[i].keys():
-                        phone = hongbao[i]['phone']
+                    if 'variety' in hongbao[i].keys():
+                        if 'phone' in hongbao[i]['variety'].keys():
+                            phone = hongbao[i]['variety']['phone']
                     baos.append(
                         '果蔬' + str(hongbao[i]['sum_condition']) + '-' + str(hongbao[i]['reduce_amount']) + '过期' +
                         hongbao[i]['end_date'])
                 elif hongbao[i]['name'].find('下午茶') != -1 and hongbao[i]['reduce_amount'] >= 7:
-                    if 'phone' in hongbao[i].keys():
-                        phone = hongbao[i]['phone']
+                    if 'variety' in hongbao[i].keys():
+                        if 'phone' in hongbao[i]['variety'].keys():
+                            phone = hongbao[i]['variety']['phone']
                     baos.append(
                         '下午茶' + str(hongbao[i]['sum_condition']) + '-' + str(hongbao[i]['reduce_amount']) + '过期' +
                         hongbao[i]['end_date'])
                 elif hongbao[i]['name'].find('夜宵') != -1 and hongbao[i]['reduce_amount'] >= 7:
-                    if 'phone' in hongbao[i].keys():
-                        phone = hongbao[i]['phone']
+                    if 'variety' in hongbao[i].keys():
+                        if 'phone' in hongbao[i]['variety'].keys():
+                            phone = hongbao[i]['variety']['phone']
                     baos.append(
                         '夜宵' + str(hongbao[i]['sum_condition']) + '-' + str(hongbao[i]['reduce_amount']) + '过期' +
                         hongbao[i]['end_date'])
