@@ -43,8 +43,7 @@ class Receive(object):
         else:
             print('红包' + channel, volume['message'])
 
-
-if __name__ == '__main__':
+def main():
     rec = Receive()
     for sid in SID.getSIDS():
         try:
@@ -57,6 +56,15 @@ if __name__ == '__main__':
             rec.getHongbao1(sid, "nr_1111pzlm")
             rec.getHongbao1(sid, "mrbc_v2")
             rec.getHongbao1(sid, "alipay_shh_201909")
-            time.sleep(0.5)
+            #rec.getHongbao1(sid, "alipay_wao")
+            rec.getHongbao1(sid, "bd_cps02")
+            rec.getHongbao1(sid, "bd_yizhifu")
+            rec.getHongbao1(sid, "bd_swuc")
+            #rec.getHongbao1(sid, "taobaoke_new")
+            rec.getHongbao1(sid, "waimaijie_31")
+            time.sleep(0.05)
         except:
             continue
+
+if __name__ == '__main__':
+    main()

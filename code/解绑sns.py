@@ -8,7 +8,7 @@ def unBindWeibo(sid):
     return requests.delete(unBindUrl, headers={'cookie': 'SID=' + sid}, json={'sns_type': 1}).status_code
 
 
-if __name__ == '__main__':
+def main():
     for sid in SID.getSIDS():
         if unBindWeibo(sid) == 200:
             print("SID=%s,解绑微博成功！" % sid)
@@ -16,3 +16,7 @@ if __name__ == '__main__':
             print("SID=%s,解绑微博失败！" % sid)
         time.sleep(0.5)  # 500毫秒一次
     print("运行结束")
+
+
+if __name__ == '__main__':
+    main()

@@ -79,7 +79,7 @@ def checkHongbao(hongbaos):
     file.close()
 
 
-def Main():
+def main():
     sids = SID.getSIDS()
     newSids = []
     hongbaos = []
@@ -131,8 +131,9 @@ def Main():
         file.write(str(line) + '\n')
     file.close()
     checkHongbao(hongbaos)
+    print('运行结束')
 
 
 if __name__ == '__main__':
-    Main()
-    print('运行结束')
+    main()
+
