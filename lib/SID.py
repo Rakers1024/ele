@@ -6,8 +6,7 @@ def getSIDS(url='../data/SID.txt', otherUrl='../../data/onekey/card.txt'):
     # 读取文件SID
     # txt = '../data/SID.txt'
     sids = []
-    card = []
-    print('测试')
+    cards = []
     with open(url, encoding='gbk') as f:
         for line in f.readlines():
             if line.find('SID=') != -1:
@@ -15,12 +14,12 @@ def getSIDS(url='../data/SID.txt', otherUrl='../../data/onekey/card.txt'):
                 #             print(line[start:start+36])
                 sids.append(line[start:start + 36])
             elif line.find('COM') == -1:
-                card.append(line)
-    #保存其他卡
-    print(card)
+                cards.append(line)
+    # 保存其他卡
+    print(cards)
     with open(otherUrl, 'w', encoding='gbk') as f:
-        for line in list(set(card)):
-            f.write(str(line)+'\n')
+        for line in list(set(cards)):
+            f.write(str(line))
     # 去重
     sids = list(set(sids))
     print('共', len(sids), '个SID')
