@@ -43,7 +43,7 @@ def queryHongbaos():
         loop.run_until_complete(getHongbaos(sids[i]))
         i += 1
         if i % 10 == 0:
-            print('查卡平均剩余时间：', (time.time() - currentTime)/10*(len(sids)-i))
+            print('查红包平均剩余时间：', (time.time() - currentTime)/10*(len(sids)-i))
             currentTime = time.time()
 
     # 保存有效SID
@@ -124,6 +124,8 @@ async def getHongbaos(sid):
             for h in hongbao:
                 if h['reduce_amount'] >= 5:
                     hs.append(h['name'] + str(h['sum_condition']) + '-' + str(h['reduce_amount']))
+            if len(hs) != 0:
+                hs = SID.sortList1(hs)
             if len(hongbao) != 0:
                 print('SID=' + sid + '有效,有' + str(len(hongbao)) + "个红包", hs)
                 # 添加sid

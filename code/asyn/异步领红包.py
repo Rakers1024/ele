@@ -1,6 +1,5 @@
 import requests
 import json
-import time
 import SID
 import asyncio
 
@@ -66,14 +65,15 @@ def getHongbao1(sid, channel,
 
 
 async def start(sid):
-    for channel in channels:
+    for channel in bigHongbaoChannels:
        # print('时间', time.time())
         if getHongbao1(sid, channel) == '未登录':
             return
 
 
 def run():
-    sids = SID.getSIDS('../../data/SID.txt')
+    # sids = SID.getSIDS('../../data/SID.txt')
+    sids = SID.getSIDS('../../data/onekey/SID.txt')
     index = 0
     while index < len(sids):
             loop.run_until_complete(start(sids[index]))

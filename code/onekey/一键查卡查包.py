@@ -1,5 +1,6 @@
 import ELE
 
+
 if __name__ == '__main__':
     queryModel = 1
     while True:
