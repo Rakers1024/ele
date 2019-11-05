@@ -13,14 +13,14 @@ newSids = []
 hongbaos = []
 
 
-def queryFaka(queryModel=1):
+def queryFaka(queryModel=1, fileName='numbers.txt'):
     timek = 100
     loop = asyncio.get_event_loop()
     if queryModel == 1:
         numbers = FaKa.getNumbers(onekeyRootPath+'save_numbers.txt')
         timek = 100
     else:
-        numbers = FaKa.getNumbers(onekeyRootPath+'numbers.txt')
+        numbers = FaKa.getNumbers(onekeyRootPath+fileName)
         timek = 1000
     i = 0
     currentTime = time.time()
