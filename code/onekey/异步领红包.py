@@ -4,12 +4,17 @@ import time
 import SID
 import asyncio
 import Data
+import random
 
 thread = 5  # 线程
 
 # 位置
 longitude = 113.266365
 latitude = 23.17275
+
+# 珠江新城
+# longitude = 113.327721
+# latitude = 23.125194
 
 
 # 活动名称
@@ -56,7 +61,6 @@ def getHongbao1(sid, channel,
     headers = {'user-agent': ua, 'cookie': 'SID=' + sid,
                'x-shard': 'loc=' + str(longitude) + ',' + str(latitude) + ';', }
     data = {'userId': userId, 'channel': channel, 'longitude': longitude, 'latitude': latitude}
-
     res = requests.post(interUrl, headers=headers, data=data)
     volume = json.loads(res.text)
     # print(volume)
@@ -121,12 +125,38 @@ def getHongbao3(sid,
                 print('双11跳一跳红包：' + volume['title'], str(volume['threshold']) + '-' + str(volume['amount']))
 
 
+def getHongbao4(sid,
+                ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/PKQ1.190714.001 Eleme/8.26.4 Channel/xiaomi ID/1da84041-3494-3fc4-a535-3421622db4b8; KERNEL_VERSION:4.9.112-perf+ API_Level:28 Hardware: Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.190714.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.21.0.24 Mobile Safari/537.36 AliApp(ELMC/8.26.4) UCBS/2.11.1.1 TTID/offical WindVane/8.5.0,UT4Aplus/0.2.16'):
+    url = 'https://h5.ele.me/restapi/traffic/berlin/issue'
+    headers = {'user-agent': ua, 'cookie': 'SID=' + sid,
+               'x-shard': 'loc=' + str(longitude) + ',' + str(latitude),
+               'x-ua': 'RenderWay/H5 AppName/elmc Longitude/str(longitude) Latitude/str(latitude) DeviceId/1da84041-3494-3fc4-a535-3421622db4b8'}
+    data = {"activityId": "RC_1074","couponId": 365978355,"comChannel": "H5","longitude": str(longitude),"latitude": str(latitude)}
+
+    # 开始游戏
+    res = requests.post(url, headers=headers, data=data)
+    print(res.text)
+
+
 async def start(sid):
-   # for channel in Data.channels:
-     #   if getHongbao1(sid, channel) == '未登录':
-            #return
-    getHongbao2(sid)
-    getHongbao3(sid)
+    try:
+        # 随机切换地址
+        global longitude, latitude
+        lola_key = list(Data.lola.keys())[random.randint(0, len(list(Data.lola.keys())))]
+        longitude = Data.lola[lola_key][0]
+        latitude = Data.lola[lola_key][1]
+        # longitude = Data.lola['云南'][0]
+        # latitude = Data.lola['云南'][1]
+        print("定位:", lola_key)
+        for channel in Data.channels:
+            if getHongbao1(sid, channel) == '未登录':
+                return
+        updateGeo(sid)
+        getHongbao2(sid)
+        # getHongbao3(sid)
+        # getHongbao4(sid)
+    except:
+        print('领取出错')
 
 
 def run():

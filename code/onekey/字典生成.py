@@ -1,5 +1,5 @@
-min = 500000
-max = 1000000
+min = 1000000
+max = 1400000
 #生成字典
 with open('../../data/onekey/字典'+str(min)+'-'+str(max)+'.txt', 'w') as f:
     for i in range(min, max+1):

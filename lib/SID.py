@@ -29,7 +29,11 @@ def getSIDS(url='../data/SID.txt', otherUrl='../../data/onekey/card.txt'):
 
 def getUserId(sid):
     userIdUrl = 'https://h5.ele.me/restapi/eus/v2/current_user?info_raw={}'
-    return requests.get(userIdUrl, headers={'cookie': 'SID=' + sid}).text
+    res = requests.get(userIdUrl, headers={'cookie': 'SID=' + sid})
+    if res.status_code == 200:
+        return res.text
+    else:
+        return ''
 
 
 # 行排序
@@ -167,17 +171,17 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
                 sid = hongbao[i]['SID']
         if len(baos) != 0:
             baos = sortList1(baos)
-            datas.append(str(phone) + '----SID=' + sid + str(baos))
+            datas.append(str(phone) + '----SID=' + sid + del0(str(baos)))
             print(str(phone) + '----SID=' + sid, baos)
 
         if len(fruits) != 0:
             fruits = sortList1(fruits)
-            datas_fruits.append(str(phone) + '----SID=' + sid + str(fruits))
+            datas_fruits.append(str(phone) + '----SID=' + sid + del0(str(fruits)))
             print(str(phone) + '----SID=' + sid, fruits)
 
         if len(limits) != 0:
             limits = sortList1(limits)
-            datas_limits.append(str(phone) + '----SID=' + sid + str(limits))
+            datas_limits.append(str(phone) + '----SID=' + sid + del0(str(limits)))
             print(str(phone) + '----SID=' + sid, limits)
 
     # 保存有红包SID
@@ -200,3 +204,8 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
         f.write("\n\n\n\n果蔬合集:\n")
         for line in datas_fruits:
             f.write(str(line) + '\n')
+
+
+# 删除.0
+def del0(s):
+    return str(s).replace(old='.0', new='')

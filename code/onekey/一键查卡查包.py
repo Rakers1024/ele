@@ -13,5 +13,5 @@ if __name__ == '__main__':
             print('输入错误！')
         else:
             break
-    ELE.queryFaka(queryModel=queryModel, fileName='字典500000-1000000.txt')
+    ELE.queryFaka(queryModel=queryModel, fileName='字典0-500000.txt')
     ELE.queryHongbaos()
