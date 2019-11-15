@@ -17,7 +17,7 @@ def getSIDS(url='../data/SID.txt', otherUrl='../../data/onekey/card.txt'):
             elif line.find('COM') == -1:
                 cards.append(line)
     # 保存其他卡
-    print(cards)
+    # print(cards)
     with open(otherUrl, 'w', encoding='gbk') as f:
         for line in list(set(cards)):
             f.write(str(line))
@@ -44,6 +44,7 @@ def sortList1(baos):
 
 # 列排序
 def sortList2(datas):
+    datas = sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("[")[1]).group()), reverse=True)
     return sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("-")[1]).group()), reverse=True)
 
 
@@ -131,12 +132,14 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
     datas = []
     datas_fruits = []
     datas_limits = []
+    datas_gzlimits = []
     for hongbao in hongbaos:
         baos = []
         # 水果红包
         fruits = []
         #有限制
         limits = []
+        gzlimits = []
 
         sid = ''
         phone = ''
@@ -153,9 +156,16 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
                                     hongbao[i]['reduce_amount'])
                                 if bao not in filters:
                                     if '8' in hongbao[i]['description_map']:
-                                        limits.append(bao + '['+hongbao[i]['description_map']['8']+']过期' + hongbao[i]['end_date'])
+                                        print(hongbao[i]['description_map']['8'].find('广州'))
+                                        if hongbao[i]['description_map']['8'].find('广州') >= 0:
+                                            gzlimits.append(bao + '[' + hongbao[i]['description_map']['8'] + ']过期' + hongbao[i]['end_date'])
+                                        else:
+                                            limits.append(bao + '[' + hongbao[i]['description_map']['8'] + ']过期' + hongbao[i]['end_date'])
                                     elif '7' in hongbao[i]['description_map']:
-                                        limits.append(bao + '[' + hongbao[i]['description_map']['7'] + ']过期' + hongbao[i]['end_date'])
+                                        if hongbao[i]['description_map']['7'].find('广州') >= 0:
+                                            gzlimits.append(bao + '[' + hongbao[i]['description_map']['7'] + ']过期' + hongbao[i]['end_date'])
+                                        else:
+                                            limits.append(bao + '[' + hongbao[i]['description_map']['7'] + ']过期' + hongbao[i]['end_date'])
                                     else:
                                         baos.append(bao + '过期' + hongbao[i]['end_date'])
                             # 水果卷另外放
@@ -171,23 +181,29 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
                 sid = hongbao[i]['SID']
         if len(baos) != 0:
             baos = sortList1(baos)
-            datas.append(str(phone) + '----SID=' + sid + del0(str(baos)))
+            datas.append(str(phone) + '----SID=' + sid + str(baos))
             print(str(phone) + '----SID=' + sid, baos)
 
         if len(fruits) != 0:
             fruits = sortList1(fruits)
-            datas_fruits.append(str(phone) + '----SID=' + sid + del0(str(fruits)))
+            datas_fruits.append(str(phone) + '----SID=' + sid + str(fruits))
             print(str(phone) + '----SID=' + sid, fruits)
 
         if len(limits) != 0:
             limits = sortList1(limits)
-            datas_limits.append(str(phone) + '----SID=' + sid + del0(str(limits)))
+            datas_limits.append(str(phone) + '----SID=' + sid + str(limits))
             print(str(phone) + '----SID=' + sid, limits)
+
+        if len(gzlimits) != 0:
+            gzlimits = sortList1(gzlimits)
+            datas_gzlimits.append(str(phone) + '----SID=' + sid + str(gzlimits))
+            print(str(phone) + '----SID=' + sid, gzlimits)
 
     # 保存有红包SID
     datas = sortList2(datas)
     datas_fruits = sortList2(datas_fruits)
     datas_limits = sortList2(datas_limits)
+    datas_gzlimits = sortList2(datas_gzlimits)
     # file = open(url, 'w')
     # for line in datas:
     #     file.write(str(line) + '\n')
@@ -195,17 +211,21 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
     with open(url, 'w') as f:
         f.write("吃吃吃合集:\n")
         for line in datas:
-            f.write(str(line) + '\n')
+            f.write(del0(str(line)) + '\n')
+
+        f.write("\n\n\n\n广州限制合集:\n")
+        for line in datas_gzlimits:
+            f.write(del0(str(line)) + '\n')
 
         f.write("\n\n\n\n有限制合集:\n")
         for line in datas_limits:
-            f.write(str(line) + '\n')
+            f.write(del0(str(line)) + '\n')
 
         f.write("\n\n\n\n果蔬合集:\n")
         for line in datas_fruits:
-            f.write(str(line) + '\n')
+            f.write(del0(str(line)) + '\n')
 
 
 # 删除.0
 def del0(s):
-    return str(s).replace(old='.0', new='')
+    return s.replace('.0', '')

@@ -54,7 +54,17 @@ def getHongbao1(sid, channel,
                 ua='Mozilla/5.0 (Linux; Android 9; MI MAX 3 Build/PKQ1.190714.001; wv) AppleWebKit/537.36 ('
                    'KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.126 MQQBrowser/6.2 TBS/044904 Mobile '
                    'Safari/537.36 MMWEBID/386 MicroMessenger/7.0.7.1521(0x27000735) Process/tools NetType/4G '
-                   'Language/zh_CN'):
+                   'Language/zh_CN', loc=['广州']):
+    # 随机切换地址
+    global longitude, latitude
+    index = random.randint(0, len(loc))
+    lola_key = '同上'
+    if index >= 0 and index < len(loc):
+        lola_key = loc[index]
+        if lola_key in loc:
+            longitude = Data.lola[lola_key][0]
+            latitude = Data.lola[lola_key][1]
+            # print("定位:", lola_key)
     updateGeo(sid)
     userId = SID.getUserId(sid)
     interUrl = 'https://h5.ele.me/restapi/traffic/users/' + userId + '/lottery'
@@ -65,9 +75,9 @@ def getHongbao1(sid, channel,
     volume = json.loads(res.text)
     # print(volume)
     if volume['message'] == '成功':
-        print('红包' + channel, str(volume['sum']['threshold']) + '-' + str(volume['sum']['amount']))
+        print(lola_key+'红包' + channel, str(volume['sum']['threshold']) + '-' + str(volume['sum']['amount']))
     else:
-        print('红包' + channel, volume['message'])
+        print(lola_key+'红包' + channel, volume['message'])
 
     return volume['message']
 
@@ -92,7 +102,7 @@ def getHongbao2(sid,
         # print(volume)
         print('口碑首页红包：' + volume['title'], str(volume['discountThreshold']) + '-' + str(volume['discountAmount']))
 
-
+# 已过期
 def getHongbao3(sid,
                 ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/PKQ1.190714.001 Eleme/8.26.4 Channel/xiaomi ID/1da84041-3494-3fc4-a535-3421622db4b8; KERNEL_VERSION:4.9.112-perf+ API_Level:28 Hardware: Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.190714.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.21.0.24 Mobile Safari/537.36 AliApp(ELMC/8.26.4) UCBS/2.11.1.1 TTID/offical WindVane/8.5.0,UT4Aplus/0.2.16'):
     startUrl = 'https://h5.ele.me/restapi/activation/api/partner/enterPlace'
@@ -124,7 +134,7 @@ def getHongbao3(sid,
                 volume = volume[0]
                 print('双11跳一跳红包：' + volume['title'], str(volume['threshold']) + '-' + str(volume['amount']))
 
-
+# 已过期
 def getHongbao4(sid,
                 ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/PKQ1.190714.001 Eleme/8.26.4 Channel/xiaomi ID/1da84041-3494-3fc4-a535-3421622db4b8; KERNEL_VERSION:4.9.112-perf+ API_Level:28 Hardware: Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.190714.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.21.0.24 Mobile Safari/537.36 AliApp(ELMC/8.26.4) UCBS/2.11.1.1 TTID/offical WindVane/8.5.0,UT4Aplus/0.2.16'):
     url = 'https://h5.ele.me/restapi/traffic/berlin/issue'
@@ -137,24 +147,55 @@ def getHongbao4(sid,
     res = requests.post(url, headers=headers, data=data)
     print(res.text)
 
+# 自动双11抽奖
+def getHongbao5(sid,
+                ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/PKQ1.190714.001 Eleme/8.26.4 Channel/xiaomi ID/1da84041-3494-3fc4-a535-3421622db4b8; KERNEL_VERSION:4.9.112-perf+ API_Level:28 Hardware: Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.190714.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.21.0.24 Mobile Safari/537.36 AliApp(ELMC/8.26.4) UCBS/2.11.1.1 TTID/offical WindVane/8.5.0,UT4Aplus/0.2.16'):
+    userId = SID.getUserId(sid)
+    hongbaoInfoUrl = 'https://h5.ele.me/restapi/traffic/lottery/my/info?activityCode=10164&uid=' + userId + '&longitude=' + str(
+        longitude) + '&latitude=' + str(latitude)
+    headers = {
+        'cookie': 'SID=' + sid
+    }
+    res = requests.get(hongbaoInfoUrl, headers=headers)
+    data = json.loads(res.text)
+    if 'data' in data.keys():
+        count = int(data['data']['game']['count'])
+    else:
+        count = 0
+    print('当前SID=' + sid)
+    for i in range(count):
+        try:
+            url = 'https://h5.ele.me/restapi/traffic/lottery/draw'
+            data = {"activityCode": 10164, "uid": userId, "longitude": str(longitude), "latitude": str(latitude)}
+            res = requests.post(url, headers=headers, data=data)
+            data2 = json.loads(res.text)
+            if data2['data']:
+                if data2['msg'] == '中奖啦':
+                    print(data2['msg'])
+                    print(data2['data'])
+        except:
+            continue
+            # print(res.text)
+
 
 async def start(sid):
     try:
-        # 随机切换地址
-        global longitude, latitude
-        lola_key = list(Data.lola.keys())[random.randint(0, len(list(Data.lola.keys())))]
-        longitude = Data.lola[lola_key][0]
-        latitude = Data.lola[lola_key][1]
-        # longitude = Data.lola['云南'][0]
-        # latitude = Data.lola['云南'][1]
-        print("定位:", lola_key)
+        # # 随机切换地址
+        # global longitude, latitude
+        # index = random.randint(0, len(list(Data.lola.keys())))
+        # if index >= 0 and index < len(list(Data.lola.keys())):
+        #     lola_key = list(Data.lola.keys())[index]
+        #     longitude = Data.lola[lola_key][0]
+        #     latitude = Data.lola[lola_key][1]
+        #     # longitude = Data.lola['云南'][0]
+        #     # latitude = Data.lola['云南'][1]
+        #     print("定位:", lola_key)
         for channel in Data.channels:
-            if getHongbao1(sid, channel) == '未登录':
+            if getHongbao1(sid=sid, channel=channel['channel'], loc=channel['loc']) == '未登录':
                 return
         updateGeo(sid)
         getHongbao2(sid)
-        # getHongbao3(sid)
-        # getHongbao4(sid)
+        # getHongbao5(sid)
     except:
         print('领取出错')
 

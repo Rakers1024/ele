@@ -13,7 +13,8 @@ def getNumbers(url='../../data/card/qq.txt'):
     numbers = []
     with open(url, encoding='utf-8') as f:
         for line in f.readlines():
-            matchObj = re.match('^(\\d+)', line)
+            matchObj = re.match('(\\d+)', line)
+            # matchObj = re.match('^(\\d+)', line)
             if matchObj:
                 number = matchObj.group()
                 if number and len(number) > 4:
