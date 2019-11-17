@@ -44,7 +44,7 @@ def sortList1(baos):
 
 # 列排序
 def sortList2(datas):
-    datas = sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("[")[1]).group()), reverse=True)
+    datas = sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("[")[1][3::]).group()), reverse=True)
     return sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("-")[1]).group()), reverse=True)
 
 
@@ -156,7 +156,6 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
                                     hongbao[i]['reduce_amount'])
                                 if bao not in filters:
                                     if '8' in hongbao[i]['description_map']:
-                                        print(hongbao[i]['description_map']['8'].find('广州'))
                                         if hongbao[i]['description_map']['8'].find('广州') >= 0:
                                             gzlimits.append(bao + '[' + hongbao[i]['description_map']['8'] + ']过期' + hongbao[i]['end_date'])
                                         else:
