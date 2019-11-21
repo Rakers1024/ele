@@ -12,6 +12,8 @@ sidPath = onekeyRootPath + 'SID.txt'
 newSids = []
 hongbaos = []
 
+# 保存sid对应的位置等信息，以备下次领取
+cookies = {}
 
 def queryFaka(queryModel=1, fileName='numbers.txt'):
     timek = 100
@@ -34,6 +36,8 @@ def queryFaka(queryModel=1, fileName='numbers.txt'):
 
 # 查询红包
 def queryHongbaos():
+    global cookies
+    cookies = SID.readCookies()
     loop = asyncio.get_event_loop()
     startTime = time.time()
     sids = SID.getSIDS(sidPath)
@@ -53,7 +57,7 @@ def queryHongbaos():
     file.close()
     SID.checkHongbao(hongbaos, url=onekeyRootPath + 'hongbaoSID_'+str(time.time()).split('.')[0]+'.txt')
     print('运行结束，用时', time.time() - startTime)
-
+    SID.writeCookies(cookies=cookies)
 
 def writeFile(lis):
     with open(sidPath, 'a') as f:
@@ -101,7 +105,7 @@ async def searchCard(number, queryModel=1):
 
 
 async def getHongbaos(sid):
-    global newSids, hongbaos
+    global newSids, hongbaos, cookies
     hongbaoUrlStart = 'https://h5.ele.me/restapi/promotion/v1/users/'
     hongbaoUrlEnd = '/coupons?cart_sub_channel=alipay%3Akoubei&latitude=23.311341&longitude=113.562687'
 
@@ -113,8 +117,18 @@ async def getHongbaos(sid):
                       'AlipayDefined(nt:4G,ws:393|0|2.75) AliApp(AP/10.1.78.7000) AlipayClient/10.1.78.7000 '
                       'Language/zh-Hans useStatusBar/true isConcaveScreen/true Region/CN '
     }
+    if sid not in cookies:
+        cookies[sid] = {}
+    if 'userId' in cookies[sid]:
+        userId = cookies[sid]['userId']
+        # 为0说明是已经登记得已失效得sid，故结束
+        if userId == '0':
+            return
+    else:
+        userId = SID.getUserId(sid)
+        cookies[sid]['userId'] = userId
     try:
-        res = requests.get(hongbaoUrlStart + SID.getUserId(sid) + hongbaoUrlEnd, headers=headers)
+        res = requests.get(hongbaoUrlStart + userId + hongbaoUrlEnd, headers=headers)
         hongbao = json.loads(res.text)
         if type(hongbao) != list:
             print('SID=' + sid + '无效')

@@ -14,6 +14,11 @@ longitude = 113.266365
 latitude = 23.17275
 
 
+# 储存当前领取的红包
+hongbaos = []
+
+# 保存sid对应的位置等信息，以备下次领取
+cookies = {}
 
 # 反向地理编码
 def updateGeo(sid):
@@ -36,38 +41,48 @@ def updateGeo(sid):
     return rep
 
 
-def getHongbao1(sid, channel,
-                ua='Mozilla/5.0 (Linux; Android 9; MI MAX 3 Build/PKQ1.190714.001; wv) AppleWebKit/537.36 ('
-                   'KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.126 MQQBrowser/6.2 TBS/044904 Mobile '
-                   'Safari/537.36 MMWEBID/386 MicroMessenger/7.0.7.1521(0x27000735) Process/tools NetType/4G '
-                   'Language/zh_CN', loc=['广州']):
+def getHongbao1(sid, channel, ua='Mozilla/5.0 (Linux; Android 9; MI MAX 3 Build/PKQ1.190714.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.126 MQQBrowser/6.2 TBS/044904 Mobile Safari/537.36 MMWEBID/386 MicroMessenger/7.0.7.1521(0x27000735) Process/tools NetType/4G Language/zh_CN', loc=['广州']):
     # 随机切换地址
     global longitude, latitude
-    index = random.randint(0, len(loc))
-    lola_key = '同上'
-    if index >= 0 and index < len(loc):
-        lola_key = loc[index]
-        if lola_key in loc:
-            longitude = Data.lola[lola_key][0]
-            latitude = Data.lola[lola_key][1]
-            # print("定位:", lola_key)
-    # updateGeo(sid)
-    userId = SID.getUserId(sid)
+    if sid not in cookies:
+        cookies[sid] = {}
+    if 'userId' in cookies[sid]:
+        userId = cookies[sid]['userId']
+    else:
+        userId = SID.getUserId(sid)
+        cookies[sid]['userId'] = userId
+    if channel not in cookies[sid]:
+        cookies[sid][channel] = {}
+    if 'longitude' in cookies[sid][channel] and 'latitude' in cookies[sid][channel]:
+        longitude = cookies[sid]['longitude']
+        latitude = cookies[sid]['latitude']
+    else:
+        index = random.randint(0, len(loc))
+        lola_key = '同上'
+        if index >= 0 and index < len(loc):
+            lola_key = loc[index]
+            if lola_key in loc:
+                longitude = Data.lola[lola_key][0]
+                latitude = Data.lola[lola_key][1]
+                # print("定位:", lola_key)
+
+
     interUrl = 'https://h5.ele.me/restapi/traffic/users/' + userId + '/lottery'
     headers = {'user-agent': ua, 'cookie': 'SID=' + sid,
                'x-shard': 'loc=' + str(longitude) + ',' + str(latitude) + ';', }
     data = {'userId': userId, 'channel': channel, 'longitude': longitude, 'latitude': latitude}
     res = requests.post(interUrl, headers=headers, data=data)
     volume = json.loads(res.text)
-    # print(volume)
+
     if volume['message'] == '成功':
         if 'data' in volume:
             for hb in volume['data']:
                 try:
                     hongbao = str(hb['title'])+str(hb['threshold'])+'-'+str(hb['amount'])
                     print(lola_key+'红包' + channel, hongbao)
-                    if hongbao.find('.0') >= 0 and hongbao.find('-1.0') == -1 and hongbao != '':
+                    if int(hb['amount']) > 5:
                         hongbaos.append(hongbao)
+                    cookies[sid][channel] = {'longitude': longitude, 'latitude': latitude}
                 except:
                     print('领取出错')
         # hongbao = str(volume['sum']['threshold']) + '-' + str(volume['sum']['amount'])
@@ -79,8 +94,11 @@ def getHongbao1(sid, channel,
         print(lola_key+'红包' + channel, hongbao)
 
 
-def getHongbao2(sid,
-                ua='Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.190714.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.20.0.32 Mobile Safari/537.36 UCBS/3.20.0.32_191012190528 NebulaSDK/1.8.100112 Nebula AlipayDefined(nt:WIFI,ws:393|0|2.75) AliApp(AP/10.1.78.7000) AlipayClient/10.1.78.7000 Language/zh-Hans useStatusBar/true isConcaveScreen/false Region/CN'):
+def getHongbao2(sid, ua='Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.190302.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.20.0.32 Mobile Safari/537.36 UCBS/3.20.0.32_191012190528 NebulaSDK/1.8.100112 Nebula AlipayDefined(nt:WIFI,ws:393|0|2.75) AliApp(AP/10.1.78.7000) AlipayClient/10.1.78.7000 Language/zh-Hans useStatusBar/true isConcaveScreen/true Region/CN'):
+    global longitude, latitude
+    if 'longitude' in cookies[sid] and 'latitude' in cookies[sid]:
+        longitude = cookies[sid]['longitude']
+        latitude = cookies[sid]['latitude']
     url = 'https://h5.ele.me/restapi/lego/query_module_content?latitude=' + str(latitude) + '&longitude=' + str(
         longitude) + '&codes[]=module_home_coupon_popup'
     headers = {'user-agent': ua, 'cookie': 'SID=' + sid,
@@ -98,12 +116,24 @@ def getHongbao2(sid,
             hongbao = str(volume['title'] + volume['discountThreshold']) + '-' + str(volume['discountAmount'])
             print('口碑首页红包：' + hongbao)
             hongbaos.append(hongbao)
+            cookies[sid]['口碑首页红包'] = {'longitude': longitude, 'latitude': latitude}
 
 # 这是饿了么客户端首页得红包
 def getHongbao3(sid, ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/Z6Lite_MIUI1_V11.0.3.0_YouLinw_191105 Eleme/8.26.4 Channel/xiaomi ID/a78ab0ea-70c2-3500-badc-e1218a28b714; KERNEL_VERSION:4.9.112-perf+ API_Level:28 Hardware:ba3232802c95d8f316278ecd188ed3e3 Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.190302.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.21.0.24 Mobile Safari/537.36 AliApp(ELMC/8.26.4) UCBS/2.11.1.1 TTID/offical WindVane/8.5.0,UT4Aplus/0.2.16'):
-    rep = updateGeo(sid)
-    geohash = rep['geohash']
-    url = 'https://restapi.ele.me/marketing/v5/users/'+SID.getUserId(sid)+'/startup_hongbao'
+
+    if sid not in cookies:
+        cookies[sid] = {}
+    if 'userId' in cookies[sid]:
+        userId = cookies[sid]['userId']
+    else:
+        userId = SID.getUserId(sid)
+        cookies[sid]['userId'] = userId
+    if '饿了么首页红包' in cookies[sid]:
+        geohash = cookies[sid]['饿了么首页红包']['geohash']
+    else:
+        rep = updateGeo(sid)
+        geohash = rep['geohash']
+    url = 'https://restapi.ele.me/marketing/v5/users/'+userId+'/startup_hongbao'
     headers = {
         'user-agent': ua,
         'cookie': 'SID=' + sid,
@@ -117,11 +147,11 @@ def getHongbao3(sid, ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/Z6Lite_
             try:
                 hongbao = str(d['hongbao_name'])+str(d['sum_condition'])+'-'+str(d['amount'])
                 hongbaos.append(hongbao)
-                print(hongbao)
+                print('首页红包'+hongbao)
+                cookies[sid]['饿了么首页红包'] = {'geohash':geohash, 'longitude': longitude, 'latitude': latitude}
+
             except:
                 print('领取错误')
-    else:
-        print(data)
 
 
 # 已过期
@@ -199,8 +229,43 @@ def getHongbao3(sid, ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/Z6Lite_
 #             continue
 #             # print(res.text)
 
+# 游戏等活动
+def getHongbao6(sid, ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/PKQ1.190714.001 Eleme/8.26.4 Channel/xiaomi ID/1da84041-3494-3fc4-a535-3421622db4b8; KERNEL_VERSION:4.9.112-perf+ API_Level:28 Hardware: Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.190714.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.21.0.24 Mobile Safari/537.36 AliApp(ELMC/8.26.4) UCBS/2.11.1.1 TTID/offical WindVane/8.5.0,UT4Aplus/0.2.16'):
+    global cookies
+    if sid not in cookies:
+        cookies[sid] = {}
+    if 'userId' in cookies[sid]:
+        userId = cookies[sid]['userId']
+    else:
+        userId = SID.getUserId(sid)
+        cookies[sid]['userId'] = userId
+    try:
+        url = 'https://h5.ele.me/restapi/traffic/lottery/draw'
+        headers = {
+                    'cookie': 'SID=' + sid
+                }
+        data = {"activityCode": 10258, "uid": userId, "longitude": str(longitude), "latitude": str(latitude)}
+        res = requests.post(url, headers=headers, data=data)
+        data2 = json.loads(res.text)
+        if data2['data']:
+            if data2['msg'] == '中奖啦':
+                print('1当前sid='+sid)
+                print(data2['msg'])
+                print(data2['data'])
+                # cookies[sid]['draw'] = {'userId': userId, 'channel': '饿了么首页红包', 'longitude': longitude, 'latitude': latitude}
 
-hongbaos = []
+        data = {"activityCode": 10223, "uid": userId, "longitude": str(longitude), "latitude": str(latitude)}
+        res = requests.post(url, headers=headers, data=data)
+        data2 = json.loads(res.text)
+        if data2['data']:
+            if data2['msg'] == '中奖啦':
+                print('2当前sid=' + sid)
+                print(data2['msg'])
+                print(data2['data'])
+    except:
+        print('领取出错')
+            # print(res.text)
+
 
 
 # 第一次执行为覆盖
@@ -220,8 +285,12 @@ def saveLog(name):
 
 # 这个是循环sid领取
 async def start(sid):
-    getHongbao2(sid)
-    getHongbao3(sid)
+    try:
+        getHongbao2(sid)
+        getHongbao3(sid)
+        getHongbao6(sid)
+    except:
+        print('领取出错')
 
 
 # 这个是循环channels的sid领取channel
@@ -231,19 +300,24 @@ def channelStart(channel, sids):
     i = 0
     currentTime = time.time()
     for sid in sids:
-        getHongbao1(sid=sid, channel=channel['channel'], loc=channel['loc'])
-        i += 1
-        hongbaos = sorted(hongbaos, key=lambda x: int(re.search("(\\d+)", x.split("-")[0]).group()), reverse=True)
-        hongbaos = sorted(hongbaos, key=lambda x: int(re.search("(\\d+)", x.split("-")[1]).group()), reverse=True)
-        if i % 5 == 0:
-            print('领红包剩余时间：', (time.time() - currentTime) / 5 * (len(sids) - i))
-            currentTime = time.time()
-            print(hongbaos)
+        try:
+            getHongbao1(sid=sid, channel=channel['channel'], loc=channel['loc'])
+            i += 1
+            hongbaos = sorted(hongbaos, key=lambda x: int(re.search("(\\d+)", x.split("-")[0]).group()), reverse=True)
+            hongbaos = sorted(hongbaos, key=lambda x: int(re.search("(\\d+)", x.split("-")[1]).group()), reverse=True)
+            if i % 5 == 0:
+                print('领红包剩余时间：', (time.time() - currentTime) / 5 * (len(sids) - i))
+                currentTime = time.time()
+                print(hongbaos)
+        except:
+            print('领取出错')
     saveLog(channel['channel'])
 
 
 def run():
-    global hongbaos
+    global hongbaos, cookies
+    cookies = SID.readCookies()
+    print(cookies)
     sids = SID.getSIDS('../../data/onekey/SID.txt')
     i = 0
     for channel in Data.channels:
@@ -260,10 +334,14 @@ def run():
             currentTime = time.time()
             print(hongbaos)
     saveLog('首页红包')
+    SID.writeCookies(cookies=cookies)
+    # 开始查询红包
+    ELE.queryFaka(queryModel=1, fileName='numbersQQ.txt')
+    ELE.queryHongbaos()
 
 
 loop = asyncio.get_event_loop()
 if __name__ == '__main__':
     # 延迟执行
-    # time.sleep(4400)
+    # time.sleep(3600+500)
     run()

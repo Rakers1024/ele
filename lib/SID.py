@@ -1,6 +1,7 @@
 import requests
 import Data
 import re
+import json
 
 
 def getSIDS(url='../data/SID.txt', otherUrl='../../data/onekey/card.txt'):
@@ -228,3 +229,21 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
 # 删除.0
 def del0(s):
     return s.replace('.0', '')
+
+
+def readCookies(url='../../data/onekey/cookies.json'):
+    try:
+        with open(url, 'r') as f:
+            cookies = json.loads(f.read())
+    except:
+        cookies = {}
+    return cookies
+
+
+def writeCookies(url='../../data/onekey/cookies.json', cookies={}):
+    try:
+        with open(url, 'w') as f:
+            # 不可用str()转换json写出
+            f.write(json.dumps(cookies))
+    except:
+        print('写入cookies失败')
