@@ -48,23 +48,25 @@ def getHongbao1(sid, channel, ua='Mozilla/5.0 (Linux; Android 9; MI MAX 3 Build/
         cookies[sid] = {}
     if 'userId' in cookies[sid]:
         userId = cookies[sid]['userId']
+        if userId == '0':
+            return
     else:
         userId = SID.getUserId(sid)
         cookies[sid]['userId'] = userId
-    if channel not in cookies[sid]:
-        cookies[sid][channel] = {}
-    if 'longitude' in cookies[sid][channel] and 'latitude' in cookies[sid][channel]:
-        longitude = cookies[sid]['longitude']
-        latitude = cookies[sid]['latitude']
-    else:
-        index = random.randint(0, len(loc))
-        lola_key = '同上'
-        if index >= 0 and index < len(loc):
-            lola_key = loc[index]
-            if lola_key in loc:
-                longitude = Data.lola[lola_key][0]
-                latitude = Data.lola[lola_key][1]
-                # print("定位:", lola_key)
+    # if channel not in cookies[sid]:
+    #     cookies[sid][channel] = {}
+    # if 'longitude' in cookies[sid][channel] and 'latitude' in cookies[sid][channel]:
+    #     longitude = cookies[sid]['longitude']
+    #     latitude = cookies[sid]['latitude']
+    # else:
+    index = random.randint(0, len(loc))
+    lola_key = '同上'
+    if index >= 0 and index < len(loc):
+        lola_key = loc[index]
+        if lola_key in loc:
+            longitude = Data.lola[lola_key][0]
+            latitude = Data.lola[lola_key][1]
+            # print("定位:", lola_key)
 
 
     interUrl = 'https://h5.ele.me/restapi/traffic/users/' + userId + '/lottery'
@@ -95,7 +97,13 @@ def getHongbao1(sid, channel, ua='Mozilla/5.0 (Linux; Android 9; MI MAX 3 Build/
 
 
 def getHongbao2(sid, ua='Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.190302.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.20.0.32 Mobile Safari/537.36 UCBS/3.20.0.32_191012190528 NebulaSDK/1.8.100112 Nebula AlipayDefined(nt:WIFI,ws:393|0|2.75) AliApp(AP/10.1.78.7000) AlipayClient/10.1.78.7000 Language/zh-Hans useStatusBar/true isConcaveScreen/true Region/CN'):
-    global longitude, latitude
+    global longitude, latitude, cookies
+    if sid not in cookies:
+        cookies[sid] = {}
+    if 'userId' in cookies[sid]:
+        userId = cookies[sid]['userId']
+        if userId == '0':
+            return
     if 'longitude' in cookies[sid] and 'latitude' in cookies[sid]:
         longitude = cookies[sid]['longitude']
         latitude = cookies[sid]['latitude']
@@ -125,6 +133,8 @@ def getHongbao3(sid, ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/Z6Lite_
         cookies[sid] = {}
     if 'userId' in cookies[sid]:
         userId = cookies[sid]['userId']
+        if userId == '0':
+            return
     else:
         userId = SID.getUserId(sid)
         cookies[sid]['userId'] = userId
@@ -236,6 +246,8 @@ def getHongbao6(sid, ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/PKQ1.19
         cookies[sid] = {}
     if 'userId' in cookies[sid]:
         userId = cookies[sid]['userId']
+        if userId == '0':
+            return
     else:
         userId = SID.getUserId(sid)
         cookies[sid]['userId'] = userId
@@ -262,10 +274,59 @@ def getHongbao6(sid, ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/PKQ1.19
                 print('2当前sid=' + sid)
                 print(data2['msg'])
                 print(data2['data'])
+
+        data = {"activityCode": 10271, "uid": userId, "longitude": str(longitude), "latitude": str(latitude)}
+        res = requests.post(url, headers=headers, data=data)
+        data2 = json.loads(res.text)
+
+        if data2['data']:
+            if data2['msg'] == '中奖啦':
+                print('2当前sid=' + sid)
+                print(data2['msg'])
+                print(data2['data'])
     except:
         print('领取出错')
             # print(res.text)
 
+
+# 签到
+def signIn(sid, ua='Mozilla/5.0 (Linux; Android 9; Lenovo L38111 Build/PKQ1.190302.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/67.0.3396.87 XWEB/992 MMWEBSDK/191001 Mobile Safari/537.36 MMWEBID/386 MicroMessenger/7.0.8.1540(0x27000833) Process/tools NetType/WIFI Language/zh_CN ABI/arm64'):
+    if sid not in cookies:
+        cookies[sid] = {}
+    if 'userId' in cookies[sid]:
+        userId = cookies[sid]['userId']
+        if userId == '0':
+            return
+    else:
+        userId = SID.getUserId(sid)
+        cookies[sid]['userId'] = userId
+
+    url = 'https://h5.ele.me/restapi/member/v2/users/'+userId+'/sign_in'
+    url2 = url+'/daily/prize'
+    headers = {
+        'user-agent': ua,
+        'cookie': 'SID=' + sid,
+        'x-shard': 'loc=' + str(longitude) + ',' + str(latitude)
+    }
+    data = {"channel": "alipay","captcha_code": "","source": "wechat","longitude": str(longitude),"latitude": str(latitude)}
+    data2 = {"channel": "alipay","index": random.randint(0, 2),"longitude": str(longitude),"latitude": str(latitude)}
+    res = requests.post(url, headers=headers, data=data)
+    if len(res.json()) == 0:
+        for i in range(2):
+            res = requests.post(url2, headers=headers, data=data2)
+        hbs = res.json()
+        for hb in hbs:
+            if hb['status'] == 1:
+                hongbao = str(hb['prizes'][0]['name'])+str(hb['prizes'][0]['sum_condition'])+'-'+str(hb['prizes'][0]['amount'])
+                print("签到红包"+hongbao)
+                if int(hb['prizes'][0]['amount']) > 5:
+                    hongbaos.append(hongbao)
+                cookies[sid]['签到红包'] = {'longitude': longitude, 'latitude': latitude}
+    # 注释以下可以加快速度
+    # res = requests.get('https://h5.ele.me/restapi/member/v1/users/'+userId+'/sign_in/info?longitude='+str(longitude)+'&latitude='+str(latitude), headers=headers)
+    # tm = res.json()
+    # if 'statuses' in tm:
+    #     print('当前签到第'+str(sum(tm['statuses']))+'天')
 
 
 # 第一次执行为覆盖
@@ -289,6 +350,7 @@ async def start(sid):
         getHongbao2(sid)
         getHongbao3(sid)
         getHongbao6(sid)
+        signIn(sid)
     except:
         print('领取出错')
 
@@ -314,14 +376,15 @@ def channelStart(channel, sids):
     saveLog(channel['channel'])
 
 
-def run():
+def run(h=0, m=0, isChannel=True):
+    time.sleep(3600 * h + 60 * m)
     global hongbaos, cookies
     cookies = SID.readCookies()
-    print(cookies)
     sids = SID.getSIDS('../../data/onekey/SID.txt')
     i = 0
-    for channel in Data.channels:
-        channelStart(channel, sids)
+    if isChannel:
+        for channel in Data.channels:
+            channelStart(channel, sids)
     currentTime = time.time()
     hongbaos = []
     while i < len(sids):
@@ -343,5 +406,8 @@ def run():
 loop = asyncio.get_event_loop()
 if __name__ == '__main__':
     # 延迟执行
-    # time.sleep(3600+500)
-    run()
+    # tim525555555554
+    # time.sleep(3600*0+60*35)
+    # n = inpu
+    # t('是否使用接口1')
+    run(0, 0, isChannel=True)

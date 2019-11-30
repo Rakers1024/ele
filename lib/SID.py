@@ -1,5 +1,6 @@
 import requests
 import Data
+import time
 import re
 import json
 
@@ -45,9 +46,17 @@ def sortList1(baos):
 
 # 列排序
 def sortList2(datas):
-    datas = sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("[")[1][3::]).group()), reverse=True)
-    return sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("-")[1]).group()), reverse=True)
+    try:
+        datas = sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("[")[1]).group()), reverse=True)
+        return sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("-")[1]).group()), reverse=True)
+    except:
+        print('排序出错')
+        return sorted(datas, key=lambda x: int(re.search("(\\d+)", x[50:].split("-")[1]).group()), reverse=True)
 
+
+# 获取时间精确到秒
+def getTime():
+    return time.strftime('%Y%m%d-%H%M%S')
 
 def checkHongbao2(hongbaos, url='../data/hongbaoSID.txt'):
     datas = []
@@ -129,7 +138,6 @@ def replaceName(name):
 
 
 def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
-    print(filters)
     datas = []
     datas_fruits = []
     datas_limits = []
@@ -157,12 +165,12 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
                                     hongbao[i]['reduce_amount'])
                                 if bao not in filters:
                                     if '8' in hongbao[i]['description_map']:
-                                        if hongbao[i]['description_map']['8'].find('广州') >= 0:
+                                        if hongbao[i]['description_map']['8'].find('广州') >= 0 or hongbao[i]['description_map']['8'].find('海珠区') >= 0:
                                             gzlimits.append(bao + '[' + hongbao[i]['description_map']['8'] + ']过期' + hongbao[i]['end_date'])
                                         else:
                                             limits.append(bao + '[' + hongbao[i]['description_map']['8'] + ']过期' + hongbao[i]['end_date'])
                                     elif '7' in hongbao[i]['description_map']:
-                                        if hongbao[i]['description_map']['7'].find('广州') >= 0:
+                                        if hongbao[i]['description_map']['7'].find('广州') >= 0 or hongbao[i]['description_map']['7'].find('海珠区') >= 0:
                                             gzlimits.append(bao + '[' + hongbao[i]['description_map']['7'] + ']过期' + hongbao[i]['end_date'])
                                         else:
                                             limits.append(bao + '[' + hongbao[i]['description_map']['7'] + ']过期' + hongbao[i]['end_date'])
@@ -247,3 +255,11 @@ def writeCookies(url='../../data/onekey/cookies.json', cookies={}):
             f.write(json.dumps(cookies))
     except:
         print('写入cookies失败')
+
+
+# 通过储存的cookies获取userid
+# def getCookiesUserId(cookies={}, sid=''):
+#     if 'userId' in cookies[sid]:
+#         userId = cookies[sid]['userId']
+#         if userId == '0':
+#             return

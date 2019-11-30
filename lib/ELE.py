@@ -55,7 +55,7 @@ def queryHongbaos():
     for line in newSids:
         file.write(str(line) + '\n')
     file.close()
-    SID.checkHongbao(hongbaos, url=onekeyRootPath + 'hongbaoSID_'+str(time.time()).split('.')[0]+'.txt')
+    SID.checkHongbao(hongbaos, url=onekeyRootPath + 'hongbaoSID_'+SID.getTime()+'.txt')
     print('运行结束，用时', time.time() - startTime)
     SID.writeCookies(cookies=cookies)
 
