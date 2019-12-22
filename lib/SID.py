@@ -154,8 +154,9 @@ def checkHongbao(hongbaos, url='../data/hongbaoSID.txt', filters=Data.filters):
         phone = ''
         for i in range(0, len(hongbao)):
             if 'name' in hongbao[i].keys():
-                if hongbao[i]['reduce_amount'] > 5 or (hongbao[i]['reduce_amount'] == 5 and (
-                        hongbao[i]['sum_condition'] < 15 or not hongbao[i]['sum_condition'])):
+                # if hongbao[i]['reduce_amount'] > 5 or (hongbao[i]['reduce_amount'] == 5 and (
+                #         hongbao[i]['sum_condition'] < 15 or not hongbao[i]['sum_condition'])):
+                if (hongbao[i]['sum_condition'] - hongbao[i]['reduce_amount'] < 100 or hongbao[i]['sum_condition'] == hongbao[i]['reduce_amount'] or hongbao[i]['sum_condition'] == 0) and hongbao[i]['reduce_amount'] > 5:
                     if 'description_map' in hongbao[i].keys():
                         # 排除商家红包
                         if '13' not in hongbao[i]['description_map']:

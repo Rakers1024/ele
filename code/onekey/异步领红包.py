@@ -289,6 +289,28 @@ def getHongbao6(sid, ua='Rajax/1 Lenovo_L38111/Kunlun2 Android/9 Display/PKQ1.19
             # print(res.text)
 
 
+def getHongbao7(sid):
+    if sid not in cookies:
+        cookies[sid] = {}
+    if 'userId' in cookies[sid]:
+        userId = cookies[sid]['userId']
+        if userId == '0':
+            return
+    url = "https://h5.ele.me/pizza/star.epic/v1/scratchcard/drawlottery"
+    headers = {
+        "cookie": "SID=" + sid,
+        "User-Agent":"Rajax/1 Lenovo_L38111/kunlun2 Android/9 Display/Z6Lite_H2OS_9.0.7_YouLinw_190813 Eleme/8.27.4 Channel/liulanqi ID/4cbabd1d-7963-348e-906b-c0e40de554c7; KERNEL_VERSION:4.9.112-perf+ API_Level:28 Hardware:c6edf20593ab62b8617ae85c336f7b88 Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.180716.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.21.0.24 Mobile Safari/537.36 AliApp(ELMC/8.27.4) UCBS/2.11.1.1 TTID/offical WindVane/8.5.0,UT4Aplus/0.2.16",
+        "x-shard":"loc=113.56410272419453,23.31278594210744"
+    }
+    data = {
+        "userAgent": "Rajax/1 Lenovo_L38111/kunlun2 Android/9 Display/Z6Lite_H2OS_9.0.7_YouLinw_190813 Eleme/8.27.4 Channel/liulanqi ID/4cbabd1d-7963-348e-906b-c0e40de554c7; KERNEL_VERSION:4.9.112-perf+ API_Level:28 Hardware:c6edf20593ab62b8617ae85c336f7b88 Mozilla/5.0 (Linux; U; Android 9; zh-CN; Lenovo L38111 Build/PKQ1.180716.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 UWS/3.21.0.24 Mobile Safari/537.36 AliApp(ELMC/8.27.4) UCBS/2.11.1.1 TTID/offical WindVane/8.5.0,UT4Aplus/0.2.16",
+        "latitude": "23.31278594210744", "longitude": "113.56410272419453", "userId": userId, "activityId": "8",
+        "deviceId": "4cbabd1d-7963-348e-906b-c0e40de554c7"}
+    res = requests.post(url, headers, data)
+    print(res.text)
+
+
+
 # 签到
 def signIn(sid, ua='Mozilla/5.0 (Linux; Android 9; Lenovo L38111 Build/PKQ1.190302.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/67.0.3396.87 XWEB/992 MMWEBSDK/191001 Mobile Safari/537.36 MMWEBID/386 MicroMessenger/7.0.8.1540(0x27000833) Process/tools NetType/WIFI Language/zh_CN ABI/arm64'):
     if sid not in cookies:
@@ -349,8 +371,9 @@ async def start(sid):
     try:
         getHongbao2(sid)
         getHongbao3(sid)
-        getHongbao6(sid)
-        signIn(sid)
+        # getHongbao7(sid)
+        # getHongbao6(sid)
+        # signIn(sid)
     except:
         print('领取出错')
 
@@ -399,15 +422,10 @@ def run(h=0, m=0, isChannel=True):
     saveLog('首页红包')
     SID.writeCookies(cookies=cookies)
     # 开始查询红包
-    ELE.queryFaka(queryModel=1, fileName='numbersQQ.txt')
-    ELE.queryHongbaos()
-
+    # ELE.queryFaka(queryModel=1, fileName='numbersQQ.txt')
+    # ELE.queryHongbaos()
+#
 
 loop = asyncio.get_event_loop()
 if __name__ == '__main__':
-    # 延迟执行
-    # tim525555555554
-    # time.sleep(3600*0+60*35)
-    # n = inpu
-    # t('是否使用接口1')
     run(0, 0, isChannel=True)
