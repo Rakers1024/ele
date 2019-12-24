@@ -14,5 +14,5 @@ if __name__ == '__main__':
         else:
             break
     if queryModel != 3:
-        ELE.queryFaka(queryModel=queryModel, fileName='字典0-500000.txt') # numbersQQ, 字典0-500000, 字典500000-1000000
+        ELE.queryFaka(queryModel=queryModel, fileName='字典500000-1000000.txt', historyIndex=0) # numbersQQ, 字典0-500000, 字典500000-1000000
     ELE.queryHongbaos()

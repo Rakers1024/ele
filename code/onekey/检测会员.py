@@ -24,9 +24,7 @@ def checkSuperVip(sid):
     res = requests.get(url, headers={'cookie': 'SID=' + sid})
     data = res.json()
     print(data)
-    if data['is_new_user']:
-        print('新用户SID='+sid)
-        newUserSids.append(sid)
+
 
 def saveSids(sids):
     url = '../../data/onekey/SuperVipSID.txt'

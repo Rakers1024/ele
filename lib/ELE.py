@@ -15,8 +15,7 @@ hongbaos = []
 # 保存sid对应的位置等信息，以备下次领取
 cookies = {}
 
-def queryFaka(queryModel=1, fileName='numbers.txt'):
-    timek = 100
+def queryFaka(queryModel=1, fileName='numbers.txt', historyIndex=0):
     loop = asyncio.get_event_loop()
     if queryModel == 1:
         numbers = FaKa.getNumbers(onekeyRootPath+'save_numbers.txt')
@@ -24,13 +23,15 @@ def queryFaka(queryModel=1, fileName='numbers.txt'):
     else:
         numbers = FaKa.getNumbers(onekeyRootPath+fileName)
         timek = 1000
-    i = 0
+    # 排序
+    numbers = sorted(numbers)
+    i = historyIndex
     currentTime = time.time()
     while i < len(numbers):
         loop.run_until_complete(searchCard(numbers[i], queryModel=queryModel))
         i += 1
         if i % timek == 0:
-            print('查卡平均剩余时间：', (time.time() - currentTime)/timek*(len(numbers)-i))
+            print('当前进度为', i,' 查卡平均剩余时间：', (time.time() - currentTime)/timek*(len(numbers)-i))
             currentTime = time.time()
 
 

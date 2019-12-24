@@ -423,7 +423,7 @@ def run(h=0, m=0, isChannel=True):
     SID.writeCookies(cookies=cookies)
     # 开始查询红包
     # ELE.queryFaka(queryModel=1, fileName='numbersQQ.txt')
-    # ELE.queryHongbaos()
+    ELE.queryHongbaos()
 #
 
 loop = asyncio.get_event_loop()
