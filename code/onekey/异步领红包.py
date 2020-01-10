@@ -75,7 +75,7 @@ def getHongbao1(sid, channel, ua='Mozilla/5.0 (Linux; Android 9; MI MAX 3 Build/
     data = {'userId': userId, 'channel': channel, 'longitude': longitude, 'latitude': latitude}
     res = requests.post(interUrl, headers=headers, data=data)
     volume = json.loads(res.text)
-
+    # print(volume)
     if volume['message'] == '成功':
         if 'data' in volume:
             for hb in volume['data']:
