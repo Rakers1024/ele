@@ -89,9 +89,16 @@ async def searchCard(number, queryModel=1):
     if res.status_code == 200:
         cardInfo = []
         soup = BeautifulSoup(res.text, 'html5lib')
-        for link in soup.select('.QueTab tr b'):
-            if link.text.find('订单未付款') < 0 and link.text.find('您的当前IP') < 0 and link.text.find('该订单有取卡密码') < 0:
-                cardInfo.append(link.text)
+        # for link in soup.select('.QueTab tr b'):
+        #     if link.text.find('订单未付款') < 0 and link.text.find('您的当前IP') < 0 and link.text.find('该订单有取卡密码') < 0 and link.text.find('卡密信息：！') < 0:
+        #         cardInfo.append(link.text)
+        for link in soup.select('.QueKO'):
+            cards = link.select('.QueTab tr b')
+            if len(cards) > 0:
+                text = link.select('.QueTab tr b')[0].text
+                if text.find('订单未付款') < 0 and text.find('您的当前IP') < 0 and text.find('该订单有取卡密码') < 0 and text.find('卡密信息：！') < 0:
+                    title = link.select('.QueKOts p')[0].text
+                    cardInfo.append(title+'\n'+text+'\n\n')
         if len(cardInfo) != 0:
             if queryModel == 1:
                 writeNumber(number, isRun=False)
