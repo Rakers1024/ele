@@ -98,7 +98,8 @@ async def searchCard(number, queryModel=1):
                 text = link.select('.QueTab tr b')[0].text
                 if text.find('订单未付款') < 0 and text.find('您的当前IP') < 0 and text.find('该订单有取卡密码') < 0 and text.find('卡密信息：！') < 0:
                     title = link.select('.QueKOts p')[0].text
-                    cardInfo.append(title+'\n'+text+'\n\n')
+                    title.replace('商家未写使用说明,售后任何疑问请联系', '')
+                    cardInfo.append(title+'\n'+text+'\n')
         if len(cardInfo) != 0:
             if queryModel == 1:
                 writeNumber(number, isRun=False)
