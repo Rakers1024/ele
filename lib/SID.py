@@ -31,10 +31,17 @@ def getSIDS(url='../data/SID.txt', otherUrl='../../data/onekey/card.txt'):
 
 def getUserId(sid):
     userIdUrl = 'https://h5.ele.me/restapi/eus/v2/current_user?info_raw={}'
-    res = requests.get(userIdUrl, headers={'cookie': 'SID=' + sid})
-    if res.status_code == 200:
-        return res.text
-    else:
+    # userIdUrl = 'https://h5.ele.me/restapi/eus/v1/current_user?info_raw={}'
+    # verify=False
+    try:
+        requests.packages.urllib3.disable_warnings()
+        res = requests.get(userIdUrl, headers={'cookie': 'SID=' + sid}, verify=False)
+        if res.status_code == 200:
+            return res.text
+        else:
+            return ''
+    except:
+        print('获取userid，发生SSL错误')
         return ''
 
 

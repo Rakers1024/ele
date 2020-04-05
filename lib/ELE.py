@@ -154,6 +154,8 @@ async def getHongbaos(sid):
                 # 添加sid
                 hongbao.append({'SID': sid})
                 hongbaos.append(hongbao)
+            else:
+                print('SID=' + sid + '有效,有' + str(len(hongbao)) + "个红包", hs)
 
     except:
         return
